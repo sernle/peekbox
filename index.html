@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peekbox — the archive app for Mac</title>
+<meta name="description" content="Open, preview and create zip, 7z, RAR and tar archives on your Mac. See inside before you extract, fix garbled file names, rescue damaged archives. $4.99, once. No subscription, no ads.">
+<link rel="icon" href="icon.png">
+<style>
+  /* Sold on the Mac App Store (app id 6830920725). */
+  :root {
+    --bg: #fbfaf8; --fg: #1d1d1f; --muted: #6e6e73; --card: #ffffff; --line: rgba(0,0,0,.08);
+    --accent: #ed7d29; --accent-ink: #ffffff; --accent-soft: rgba(237,125,41,.12);
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 30px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141414; --fg: #f5f5f7; --muted: #a1a1a6; --card: #1d1d1f; --line: rgba(255,255,255,.1);
+      --accent-soft: rgba(237,125,41,.18); --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141414; --fg: #f5f5f7; --muted: #a1a1a6; --card: #1d1d1f; --line: rgba(255,255,255,.1);
+    --accent-soft: rgba(237,125,41,.18); --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 30px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  header.top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; color: var(--fg); }
+  .brand img { width: 32px; height: 32px; }
+  nav a { color: var(--muted); margin-left: 22px; font-size: 15px; }
+  .hero { text-align: center; padding: 56px 0 28px; }
+  .hero img.icon { width: 112px; height: 112px; }
+  h1 { font-size: clamp(36px, 6vw, 56px); line-height: 1.08; letter-spacing: -0.02em; margin: 18px 0 14px; }
+  .lede { font-size: clamp(18px, 2.2vw, 21px); color: var(--muted); max-width: 640px; margin: 0 auto; }
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 30px 0 10px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px; border-radius: 12px; font-weight: 600; font-size: 17px; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); }
+  .btn.secondary { background: var(--accent-soft); color: var(--accent); }
+  .fine { color: var(--muted); font-size: 14px; }
+  .shot { margin: 40px auto 0; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--line); max-width: 900px; }
+  .shot img { display: block; width: 100%; height: auto; }
+  section { padding: 64px 0 0; }
+  h2 { font-size: clamp(26px, 3.6vw, 34px); letter-spacing: -0.01em; margin: 0 0 8px; text-align: center; }
+  .sub { color: var(--muted); text-align: center; margin: 0 auto 32px; max-width: 620px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; box-shadow: var(--shadow); }
+  .card h3 { margin: 10px 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15.5px; }
+  .glyph { width: 36px; height: 36px; border-radius: 9px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-size: 19px; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; }
+  .split img { width: 100%; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .split img.plain { border: 0; box-shadow: none; border-radius: 0; }
+  .split h3 { font-size: 24px; margin: 0 0 10px; }
+  .split p { color: var(--muted); margin: 0 0 10px; }
+  .price { text-align: center; }
+  .price .amount { font-size: 56px; font-weight: 800; letter-spacing: -0.02em; }
+  .price ul { list-style: none; padding: 0; margin: 18px auto 26px; max-width: 420px; text-align: left; }
+  .price li { padding: 7px 0 7px 28px; position: relative; border-bottom: 1px solid var(--line); }
+  .price li::before { content: "✓"; position: absolute; left: 4px; color: var(--accent); font-weight: 700; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; }
+  summary { font-weight: 600; cursor: pointer; }
+  details p { color: var(--muted); margin: 10px 0 0; }
+  footer { color: var(--muted); font-size: 14px; padding: 64px 0 40px; text-align: center; }
+  @media (max-width: 760px) {
+    nav { display: none; }
+    .split { grid-template-columns: 1fr; }
+    .split.reverse > :first-child { order: 2; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#"><img src="icon.png" alt="">Peekbox</a>
+    <nav><a href="#features">Features</a><a href="#finder">Finder</a><a href="#price">Price</a><a href="#faq">FAQ</a></nav>
+  </header>
+
+  <div class="hero">
+    <img class="icon" src="icon.png" alt="Peekbox app icon">
+    <h1>See inside every archive.<br>Then open it right.</h1>
+    <p class="lede">Peekbox opens, previews and creates zip, 7z, RAR and tar files on your Mac — and fixes the things other unzip apps get wrong.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://apps.apple.com/app/id6830920725">Get it on the Mac App Store</a>
+      <a class="btn secondary" href="#features">See what it does</a>
+    </div>
+    <p class="fine">One-time purchase · No subscription, ads or account · macOS 14 Sonoma or later · Apple silicon and Intel</p>
+    <div class="shot"><img src="browse.png?v=2" alt="Peekbox showing the folders and files inside Project Files.zip, with sizes and dates" width="1800" height="984"></div>
+  </div>
+
+  <section id="features">
+    <h2>Everything an archive app should do</h2>
+    <p class="sub">Built from what people actually complain about in reviews of Mac and iPhone archive apps.</p>
+    <div class="grid">
+      <div class="card"><div class="glyph">👀</div><h3>Look before you extract</h3><p>Browse folders inside any archive, preview a file with Space, and drag out only what you need.</p></div>
+      <div class="card"><div class="glyph">📂</div><h3>Smart extraction</h3><p>One item comes out as itself, many land in a single folder. No “Archive 2/Archive/Archive” nesting, no __MACOSX clutter.</p></div>
+      <div class="card"><div class="glyph">あ</div><h3>Fixes garbled names</h3><p>Zips made on Windows in Japanese, Chinese, Korean, Cyrillic and more are detected and shown with the right characters.</p></div>
+      <div class="card"><div class="glyph">🩹</div><h3>Rescues damaged archives</h3><p>Names exactly which files are broken and extracts everything that's still intact, instead of giving up.</p></div>
+      <div class="card"><div class="glyph">🔒</div><h3>Passwords, remembered</h3><p>Opens encrypted zip, 7z and RAR. Creates AES-256 archives. Saved passwords live in your Keychain and are tried for you.</p></div>
+      <div class="card"><div class="glyph">🗂</div><h3>A folder of zips? Done.</h3><p>Drop many archives or a whole folder: each is extracted in turn, split sets counted once, locked ones wait for you.</p></div>
+      <div class="card"><div class="glyph">✂️</div><h3>Split and clean</h3><p>Make 25 MB, 100 MB or custom-size parts for email and uploads. Leave out node_modules, .git and Mac junk with a live size preview.</p></div>
+      <div class="card"><div class="glyph">⚡️</div><h3>Fast with huge archives</h3><p>A 100,000-file archive opens in about two seconds, and the window never freezes. Powered by the official 7-Zip engine.</p></div>
+    </div>
+  </section>
+
+  <section id="finder">
+    <h2>Built into Finder</h2>
+    <p class="sub">You don't even have to open the app.</p>
+    <div class="split">
+      <img class="plain" src="thumbnails.png?v=2" alt="Finder icons for archives showing their format, first files, file count and a lock for protected ones" width="1320" height="940">
+      <div>
+        <h3>Icons that show what's inside</h3>
+        <p>Archives in Finder show their format, the first folders and files, how many files and how big — and a lock when they're password-protected.</p>
+        <h3>Press Space to peek</h3>
+        <p>Quick Look shows the whole folder tree of a zip, 7z or RAR, with sizes and fixed file names, without extracting anything.</p>
+        <h3>Right-click to extract or compress</h3>
+        <p>Quick Actions put “Extract with Peekbox” and “Compress to ZIP” in Finder's right-click menu.</p>
+      </div>
+    </div>
+    <div class="split reverse" style="margin-top:40px">
+      <div>
+        <h3>Set up in one screen</h3>
+        <p>On first launch Peekbox shows exactly what's switched on and fixes the rest in one click: make it the default for archives, turn on Finder previews, add Quick Actions.</p>
+        <p class="fine">Opens: zip, 7z, RAR (v4 and v5, multi-part), tar, tar.gz, tgz, tar.bz2, tar.xz, gz, bz2, xz, cab, cpio, jar, iso and split .001 sets. Creates: zip and 7z.</p>
+      </div>
+      <img src="welcome.png?v=2" alt="Peekbox's welcome screen with three setup steps and their status" width="1120" height="846">
+    </div>
+  </section>
+
+  <section id="price" class="price">
+    <h2>One price. Yours to keep.</h2>
+    <div class="amount">$4.99</div>
+    <p class="fine">Pay once. Free updates for version 1.</p>
+    <ul>
+      <li>All features, no in-app purchases</li>
+      <li>No subscription, ads, tracking or account</li>
+      <li>Works offline: your files never leave your Mac</li>
+      <li>Use it on all your own Macs</li>
+    </ul>
+    <a class="btn primary" href="https://apps.apple.com/app/id6830920725">Get Peekbox on the Mac App Store</a>
+    <p class="fine" style="margin-top:14px">Bought through your Apple Account; updates arrive through the App Store.</p>
+  </section>
+
+  <section id="faq">
+    <h2>Questions</h2>
+    <p class="sub"></p>
+    <details><summary>How do I get updates?</summary><p>Through the Mac App Store, like any other app — automatically if you have App Store updates turned on.</p></details>
+    <details><summary>Which Macs does it run on?</summary><p>macOS 14 Sonoma or later, on Apple silicon and Intel Macs.</p></details>
+    <details><summary>Does it upload my files anywhere?</summary><p>No. Peekbox makes no network connections. Everything happens on your Mac, and saved passwords stay in your own Keychain.</p></details>
+    <details><summary>Can it create RAR files?</summary><p>No — RAR is a closed format whose compressor isn't licensed for other apps. Peekbox opens RAR (including encrypted and multi-part), and creates zip and 7z.</p></details>
+    <details><summary>The Finder previews don't appear.</summary><p>Open Peekbox's Help menu → Welcome to Peekbox. It shows which parts are switched on and opens the right System Settings page for the rest.</p></details>
+    <details><summary>What about the 7-Zip engine?</summary><p>Peekbox includes the official 7-Zip by Igor Pavlov, under the GNU LGPL. Its licence and source link are in Peekbox's About window.</p></details>
+  </section>
+
+  <footer>
+    Peekbox · Made for the Mac · <a href="support.html">Support</a> · <a href="privacy.html">Privacy</a><br>
+    7-Zip is © Igor Pavlov, used under the GNU LGPL. Mac, macOS and Finder are trademarks of Apple Inc.
+  </footer>
+</div>
+</body>
+</html>
